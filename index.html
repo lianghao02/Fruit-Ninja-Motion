@@ -109,11 +109,8 @@
     </div>
 </div>
 
-<!-- 隱藏的 YouTube 播放器容器 (部署到 GitHub Pages 後完美運作) -->
-<div id="ytplayer"></div>
-
-<!-- 引入 YouTube Iframe API -->
-<script src="https://www.youtube.com/iframe_api"></script>
+<!-- 隱藏的 YouTube 播放器容器 -->
+<div id="yt-container" class="hidden"></div>
 
 <script>
 // ==========================================
@@ -133,9 +130,8 @@ const CONFIG = {
         BANANA_PROBABILITY: 0.08, 
         BANANA_DURATION: 300, 
         PARTY_TIME: 60,
-        // YouTube 無版權音樂 (NCS 熱血神曲: Tobu - Hope)
-        // 來源: NoCopyrightSounds 頻道
-        BGM_YOUTUBE_ID: 'EP625xQIGzs'
+        // YouTube 無版權音樂: Alan Walker - Spectre
+        BGM_YOUTUBE_ID: '2PyrZdUVBb4'
     },
     TRACKING: {
         BLADE_REACH: 3.5, // 手腕到掌心連線的延伸倍率，適應大螢幕
@@ -197,36 +193,15 @@ const SoundSys = {
 };
 
 // ==========================================
-// 🎶 YouTube 無版權神曲播放系統 (YouTube Iframe API)
-// 完美整合 GitHub Pages (HTTPS) 環境
+// 🎶 YouTube 無版權神曲播放系統 (純 iframe 黑科技)
 // ==========================================
-let ytPlayer;
-function onYouTubeIframeAPIReady() {
-    ytPlayer = new YT.Player('ytplayer', {
-        height: '0',
-        width: '0',
-        videoId: CONFIG.GAME.BGM_YOUTUBE_ID,
-        playerVars: {
-            'autoplay': 0, // 手動控制
-            'controls': 0,
-            'loop': 1,     // 循環播放
-            'playlist': CONFIG.GAME.BGM_YOUTUBE_ID // loop 需要指定 playlist
-        }
-    });
-}
-
 const BGMSystem = {
     start() {
-        if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-            ytPlayer.setVolume(35); // 音量 35%，避免蓋過切水果的清脆音效
-            ytPlayer.playVideo();
-        }
+        // 背景音樂已經在點擊啟動按鈕時播放，此處不作操作
     },
     
     stop() {
-        if (ytPlayer && typeof ytPlayer.pauseVideo === 'function') {
-            ytPlayer.pauseVideo();
-        }
+        // 遊戲結束時保持背景音樂熱血播放
     }
 };
 
@@ -977,10 +952,10 @@ hands.initialize().then(() => {
 document.getElementById('btnInit').addEventListener('click', () => {
     if(audioCtx.state === 'suspended') audioCtx.resume();
     
-    // 預先啟動一次 YT，解決瀏覽器自動播放限制
-    if (ytPlayer && typeof ytPlayer.playVideo === 'function') {
-        ytPlayer.playVideo();
-        ytPlayer.pauseVideo();
+    // 【終極黑科技】利用真實的滑鼠點擊事件，強制注入帶有 autoplay 的 YouTube Iframe，瀏覽器絕對放行！
+    let ytContainer = document.getElementById('yt-container');
+    if (ytContainer.innerHTML === '') {
+        ytContainer.innerHTML = `<iframe width="1" height="1" src="https://www.youtube.com/embed/${CONFIG.GAME.BGM_YOUTUBE_ID}?autoplay=1&loop=1&playlist=${CONFIG.GAME.BGM_YOUTUBE_ID}" frameborder="0" allow="autoplay; encrypted-media"></iframe>`;
     }
     
     document.getElementById('startScreen').classList.add('hidden');
