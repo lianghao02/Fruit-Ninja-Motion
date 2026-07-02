@@ -30,7 +30,8 @@
         .text-neon-pink { text-shadow: 0 0 10px #ec4899, 0 0 20px #ec4899; color: #fce7f3; }
         
         #overlay-screens { position: absolute; inset: 0; z-index: 20; pointer-events: none; }
-        .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; background: rgba(5, 5, 5, 0.7); backdrop-filter: blur(5px); transition: opacity 0.5s; }
+        .screen { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s; }
+        .bg-blur { background: rgba(5, 5, 5, 0.85); backdrop-filter: blur(10px); }
         .hidden { opacity: 0; pointer-events: none; display: none !important; }
 
         .btn {
@@ -83,29 +84,28 @@
 
 <div id="overlay-screens">
     <!-- 載入畫面 -->
-    <div id="loadingScreen" class="screen">
+    <div id="loadingScreen" class="screen bg-blur">
         <div class="animate-spin rounded-full h-32 w-32 border-t-4 border-b-4 border-[#38bdf8] mb-4"></div>
         <h1 class="text-4xl font-bold text-neon-blue">啟動神經連結中...</h1>
         <p class="mt-4 text-gray-400">正在下載 MediaPipe 模型...</p>
     </div>
 
     <!-- 授權與開始畫面 (解決瀏覽器音效自動播放政策) -->
-    <div id="startScreen" class="screen hidden" style="pointer-events: auto;">
+    <div id="startScreen" class="screen bg-blur hidden" style="pointer-events: auto;">
         <h1 class="text-5xl font-bold text-neon-pink mb-12">神經連結已就緒</h1>
         <button class="btn" id="btnInit">點擊這裡以開啟音效與相機</button>
     </div>
 
     <!-- 主選單 (取消按鈕，改用語音/體感) -->
-    <div id="menuScreen" class="screen hidden">
+    <div id="menuScreen" class="screen hidden" style="justify-content: flex-start; padding-top: 10vh;">
         <h1 class="text-[5rem] font-bold text-neon-pink mb-4 text-center">體感水果忍者</h1>
         <p class="text-2xl text-neon-blue mb-8 font-bold">揮舞手臂，切開下方的水果來選擇模式！</p>
     </div>
 
     <!-- 遊戲結束畫面 -->
-    <div id="gameOverScreen" class="screen hidden">
+    <div id="gameOverScreen" class="screen hidden" style="justify-content: flex-start; padding-top: 15vh;">
         <h1 id="gameOverTitle" class="text-[5rem] font-bold text-neon-red mb-4">系統過載</h1>
         <p id="gameOverSub" class="text-4xl text-neon-blue mb-8 font-bold">最終得分: <span id="finalScore">0</span></p>
-        <p class="text-2xl text-gray-300 mt-10">切開下方的水果重新啟動</p>
     </div>
 </div>
 
