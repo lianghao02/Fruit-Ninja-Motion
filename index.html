@@ -323,7 +323,7 @@ function getEmojiSprite(emoji, size = 60) {
 
 class Fruit {
     constructor(canvasWidth, canvasHeight, isSpecial = false, isFrenzy = false) {
-        this.radius = 40;
+        this.radius = 160; // 判定範圍放大 4 倍 (原本是 40)
         const types = ['🍎', '🍉', '🍇', '🍍', '🥝'];
         
         this.emoji = types[Math.floor(Math.random() * types.length)];
@@ -381,10 +381,11 @@ class Fruit {
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
         
-        const sprite = getEmojiSprite(this.emoji, this.isBomb ? 70 : 60);
+        // 顯示大小放大 4 倍 (原本是 70 / 60)
+        const sprite = getEmojiSprite(this.emoji, this.isBomb ? 280 : 240);
         
         if (this.cut) {
-            const split = this.cutFrames * 2;
+            const split = this.cutFrames * 4;
             // 左半
             ctx.drawImage(sprite.canvas, 0, 0, sprite.width/2, sprite.height, 
                           -sprite.width/2 - split, -sprite.height/2, sprite.width/2, sprite.height);
@@ -396,9 +397,9 @@ class Fruit {
             // 特殊發光
             if(this.isIce || this.isDragon) {
                 ctx.beginPath();
-                ctx.arc(0, 0, 45, 0, Math.PI*2);
+                ctx.arc(0, 0, 180, 0, Math.PI*2); // 發光圈放大 (原本是 45)
                 ctx.strokeStyle = this.isIce ? '#aaddff' : '#ff0066';
-                ctx.lineWidth = 5;
+                ctx.lineWidth = 15;
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = ctx.strokeStyle;
                 ctx.stroke();
@@ -465,6 +466,7 @@ const GameEngine = {
         this.mode = mode;
         this.state = 'PLAYING';
         this.reset();
+        this.uiButtons = []; // 清空所有選單按鈕，避免殘留畫面上
         
         document.getElementById('menuScreen').classList.add('hidden');
         document.getElementById('gameOverScreen').classList.add('hidden');
