@@ -323,7 +323,7 @@ function getEmojiSprite(emoji, size = 60) {
 
 class Fruit {
     constructor(canvasWidth, canvasHeight, isSpecial = false, isFrenzy = false) {
-        this.radius = 160; // 判定範圍放大 4 倍 (原本是 40)
+        this.radius = 320; // 判定範圍再放大 1 倍 (原本 160 -> 320)
         const types = ['🍎', '🍉', '🍇', '🍍', '🥝'];
         
         this.emoji = types[Math.floor(Math.random() * types.length)];
@@ -369,11 +369,17 @@ class Fruit {
     }
 
     update(iceFactor) {
-        this.x += this.vx * iceFactor;
-        this.y += this.vy * iceFactor;
-        this.vy += 0.5 * iceFactor; // 重力
-        this.rotation += this.vRot * iceFactor;
-        if (this.cut) this.cutFrames++;
+        if (this.cut) {
+            this.cutFrames++;
+            // 被切開後不吃重力，停滯在空中慢慢向外飄移並淡出
+            this.x += this.vx * 0.1;
+            this.y += this.vy * 0.1;
+        } else {
+            this.x += this.vx * iceFactor;
+            this.y += this.vy * iceFactor;
+            this.vy += 0.5 * iceFactor; // 重力
+            this.rotation += this.vRot * iceFactor;
+        }
     }
 
     draw(ctx) {
@@ -381,25 +387,33 @@ class Fruit {
         ctx.translate(this.x, this.y);
         ctx.rotate(this.rotation);
         
-        // 顯示大小放大 4 倍 (原本是 70 / 60)
-        const sprite = getEmojiSprite(this.emoji, this.isBomb ? 280 : 240);
+        // 顯示大小再放大 1 倍 (原本 280/240 -> 560/480)
+        const sprite = getEmojiSprite(this.emoji, this.isBomb ? 560 : 480);
         
         if (this.cut) {
-            const split = this.cutFrames * 4;
+            const split = this.cutFrames * 6; // 散開速度
+            
+            // 1秒內淡化消失 (1秒 = 60幀)
+            let alpha = 1.0 - (this.cutFrames / 60);
+            if (alpha < 0) alpha = 0;
+            ctx.globalAlpha = alpha;
+            
             // 左半
             ctx.drawImage(sprite.canvas, 0, 0, sprite.width/2, sprite.height, 
                           -sprite.width/2 - split, -sprite.height/2, sprite.width/2, sprite.height);
             // 右半
             ctx.drawImage(sprite.canvas, sprite.width/2, 0, sprite.width/2, sprite.height, 
                           split, -sprite.height/2, sprite.width/2, sprite.height);
+                          
+            ctx.globalAlpha = 1.0;
         } else {
             ctx.drawImage(sprite.canvas, -sprite.width/2, -sprite.height/2);
             // 特殊發光
             if(this.isIce || this.isDragon) {
                 ctx.beginPath();
-                ctx.arc(0, 0, 180, 0, Math.PI*2); // 發光圈放大 (原本是 45)
+                ctx.arc(0, 0, 360, 0, Math.PI*2); // 發光圈放大 (180 -> 360)
                 ctx.strokeStyle = this.isIce ? '#aaddff' : '#ff0066';
-                ctx.lineWidth = 15;
+                ctx.lineWidth = 20;
                 ctx.shadowBlur = 20;
                 ctx.shadowColor = ctx.strokeStyle;
                 ctx.stroke();
@@ -646,7 +660,7 @@ const GameEngine = {
                         if (this.lives <= 0) this.endGame();
                     }
                     this.fruits.splice(i, 1);
-                } else if (f.cutFrames > 20) {
+                } else if (f.cutFrames > 60) {
                     this.fruits.splice(i, 1);
                 }
             }
