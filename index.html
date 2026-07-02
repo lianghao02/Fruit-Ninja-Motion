@@ -787,15 +787,12 @@ hands.onResults((results) => {
             const landmarks = results.multiHandLandmarks[index];
             let handIdx = index < 4 ? index : 3; 
             
-            // 取手掌心
-            let wrist = landmarks[0];
+            // 取手掌心 (Middle Finger MCP) 作為絕對追蹤點
             let middleMcp = landmarks[9];
             
-            let dx = middleMcp.x - wrist.x;
-            let dy = middleMcp.y - wrist.y;
-            
-            let rawX = middleMcp.x + dx * CONFIG.TRACKING.BLADE_REACH;
-            let rawY = middleMcp.y + dy * CONFIG.TRACKING.BLADE_REACH;
+            // 取消光劍延伸算法，直接將追蹤點綁死在掌心，徹底解決飄移與對不準的問題
+            let rawX = middleMcp.x;
+            let rawY = middleMcp.y;
             
             let px = (1 - rawX) * cw;
             let py = rawY * ch;
